@@ -2,14 +2,12 @@ from vkbottle.bot import Message as Message_vk, Bot as Bot_vk
 from typing import NewType, Any
 from config import DAIKON_BATAT_VK_ID
 
-from secrets import token_urlsafe
 
-
-BotManager = NewType('BotManager', Any)  # For typing
+Application = NewType('Application', Any)  # For typing
 
 
 # Func creates vk bot and handlers for it.
-def create_vk_bot(token: str, bot_manager: BotManager) -> Bot_vk:
+def create_vk_bot(token: str, app: Application) -> Bot_vk:
     # Creating vk bot
     vk_bot = Bot_vk(token=token)
 
@@ -20,10 +18,11 @@ def create_vk_bot(token: str, bot_manager: BotManager) -> Bot_vk:
         if message.action and message.action.type == 'chat_invite_user' and \
                 abs(message.action.member_id) == DAIKON_BATAT_VK_ID:
 
-            token = token_urlsafe(message.chat_id)
-            await bot_manager.add_chat(token, message.chat_id)
+            # Getting calculated chat token and sending it to the chat.
+            # Chat token was made for safety and prevents selecting chats that aren't yours
+            chat_token = await app.add_chat(message.chat_id)
             await message.answer('Дайкон батат. ' +
-                                 f'\nВот id вашего чата: {token}' +
+                                 f'\nВот id вашего чата: {chat_token}' +
                                  '\nДобавьте его в рассылку при помощи команды select в телеграмм боте -> @DaikonBatatBOT' +
                                  '\nПример: /select 2')
 

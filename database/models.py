@@ -6,6 +6,7 @@ from typing import Callable, Protocol
 from functools import wraps
 
 
+# Decorator that executes sql request and returns all scalars
 def execute_scalars(func: Callable):
     @wraps(func)
     async def wrapper(self, *args, **kwargs):
@@ -20,6 +21,7 @@ def execute_scalars(func: Callable):
     return wrapper
 
 
+# Decorator that executes sql request and returns one scalar
 def execute_one_scalar(func: Callable):
     @wraps(func)
     async def wrapper(self, *args, **kwargs):
@@ -34,6 +36,7 @@ def execute_one_scalar(func: Callable):
     return wrapper
 
 
+# Decorator that executes and commits sql request
 def execute_and_commit(func: Callable):
     @wraps(func)
     async def wrapper(self, *args, **kwargs):
@@ -50,14 +53,18 @@ def execute_and_commit(func: Callable):
     return wrapper
 
 
+# Interface for databases
 class DataBaseInterface(Protocol):
     session_maker: async_sessionmaker
 
 
+# Base from sqlalchemy for databases
 class Base(DeclarativeBase):
     pass
 
 
+# Users database with 2 columns: id, token
+# Both primary keys, so one user can have many selected chats
 class Users(Base):
     __tablename__ = 'users'
 
@@ -68,6 +75,8 @@ class Users(Base):
     )
 
 
+# Users database with 2 columns: token, id
+# Chat token was made for safety and prevents selecting chats that aren't yours
 class Chats(Base):
     __tablename__ = 'chats'
 
